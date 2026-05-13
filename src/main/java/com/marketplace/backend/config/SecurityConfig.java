@@ -1,6 +1,7 @@
 package com.marketplace.backend.config;
 
 import com.marketplace.backend.security.JwtAuthFilter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -31,6 +32,10 @@ public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
     private final UserDetailsService userDetailsService;
+
+    // Variable d'environnement pour CORS - chaque dev met son IP
+    @Value("${cors.allowed.origins:http://localhost:30080}")
+    private String allowedOrigins;
 
     public SecurityConfig(JwtAuthFilter jwtAuthFilter, UserDetailsService userDetailsService) {
         this.jwtAuthFilter = jwtAuthFilter;
@@ -69,7 +74,8 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://192.168.142.130:30080"));
+        // Utilise la variable d'environnement au lieu de l'IP hardcodée
+        config.setAllowedOrigins(List.of(allowedOrigins));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
